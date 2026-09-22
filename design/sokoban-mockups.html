@@ -1,0 +1,268 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>동굴 소코반 디자인 시안</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=Black+Han+Sans&family=Noto+Sans+KR:wght@400;500;700&family=Gowun+Dodum&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --rock:#2a2320; --rock-dark:#1a1512; --rock-light:#4a3c33; --dirt:#3d2f25;
+    --glow:#7ee0ff; --wood:#a86a32; --wood-dark:#6d4220; --wood-done:#58c46a;
+    --torch:#ffb347; --text:#f1e6d6; --muted:#b7a58f;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:#120e0b;color:var(--text);font-family:'Noto Sans KR',system-ui,sans-serif;padding:32px 24px 64px}
+  h1{font-family:'Gowun Batang',serif;font-weight:700;font-size:26px;margin:0 0 6px}
+  .lead{color:var(--muted);margin:0 0 32px;max-width:60ch;line-height:1.6}
+  .row{display:grid;grid-template-columns:repeat(auto-fit,minmax(360px,1fr));gap:40px;align-items:start}
+  .proposal h2{font-size:18px;margin:0 0 4px}
+  .proposal p{color:var(--muted);font-size:14px;line-height:1.6;margin:0 0 16px;max-width:42ch}
+  .proposal ul{color:var(--muted);font-size:13px;line-height:1.7;padding-left:18px;margin:14px 0 0}
+  .phone{width:360px;height:720px;border-radius:36px;border:8px solid #0a0806;overflow:hidden;position:relative;background:var(--rock-dark);box-shadow:0 30px 60px rgba(0,0,0,.6)}
+  .scr{position:absolute;inset:0;display:flex;flex-direction:column}
+  .board-wrap{flex:1;min-height:0;display:flex;align-items:center;justify-content:center;position:relative}
+  .board{position:relative;--cell:48px}
+  .cell{position:absolute;width:var(--cell);height:var(--cell);top:0;left:0}
+
+  /* ================= A. 횃불 빛 ================= */
+  .A{font-family:'Gowun Batang',serif}
+  .A .hud{display:flex;align-items:center;justify-content:space-between;padding:14px 18px 10px}
+  .A .hud .lv{font-size:22px;font-weight:700;line-height:1}
+  .A .hud .lv small{display:block;font-size:12px;color:var(--muted);font-weight:400;margin-top:4px}
+  .A .hud .moves{font-size:13px;color:var(--muted);text-align:right}
+  .A .hud .moves b{display:block;font-size:22px;color:var(--text)}
+  .A .back{color:var(--muted);font-size:14px;background:none;border:0;font-family:inherit}
+  .A .board-wrap{background:radial-gradient(circle at 50% 46%, rgba(255,179,71,.14), transparent 55%)}
+  .A .floor{background:var(--dirt);box-shadow:inset 0 0 0 1px rgba(0,0,0,.25)}
+  .A .wall{background:var(--rock);border-radius:3px;box-shadow:inset 0 0 0 2px var(--rock-light),inset 0 -4px 0 rgba(0,0,0,.4)}
+  .A .goal::after{content:'';position:absolute;inset:30%;border-radius:50%;border:2px solid var(--glow);box-shadow:0 0 10px 2px rgba(126,224,255,.55);opacity:.85}
+  .A .box::before{content:'';position:absolute;inset:8%;border-radius:5px;background:var(--wood);box-shadow:inset 0 0 0 3px var(--wood-dark),0 3px 4px rgba(0,0,0,.5);
+    background-image:linear-gradient(to bottom,transparent 45%,rgba(0,0,0,.25) 45% 55%,transparent 55%),linear-gradient(to right,transparent 45%,rgba(0,0,0,.25) 45% 55%,transparent 55%)}
+  .A .box.done::before{background-color:var(--wood-done);box-shadow:inset 0 0 0 3px #2f8a40,0 0 14px rgba(88,196,106,.7)}
+  .A .box.done::after{content:'✔';position:absolute;inset:0;display:grid;place-items:center;color:#0e3b18;font-weight:900;font-size:24px}
+  .A .player::before{content:'';position:absolute;inset:19%;border-radius:50% 50% 40% 40%;background:radial-gradient(circle at 35% 35%,#ffe3b0,var(--torch) 60%,#c47a1c);box-shadow:0 0 16px 4px rgba(255,179,71,.45)}
+  /* 핵심: 플레이어를 중심으로 한 어둠 마스크 */
+  .A .dark{position:absolute;inset:0;pointer-events:none;
+    background:radial-gradient(circle at var(--lx) var(--ly), transparent 80px, rgba(20,14,10,.45) 140px, rgba(20,14,10,.9) 230px)}
+  .A .ctl{display:flex;align-items:center;justify-content:space-between;padding:12px 22px 26px}
+  .A .stack{display:flex;flex-direction:column;gap:10px}
+  .A .plank{background:linear-gradient(#8a5a2c,#6d4220);border:0;border-radius:4px;color:#ffe3b0;font-family:inherit;font-size:14px;padding:10px 14px;box-shadow:inset 0 0 0 1px rgba(0,0,0,.35),0 3px 0 #3d2410}
+  .A .plank.dim{opacity:.45}
+  .A .disc{width:132px;height:132px;border-radius:50%;background:radial-gradient(circle at 40% 35%,#5a4a3f,#2a2320 70%);box-shadow:inset 0 0 0 3px #4a3c33,inset 0 -6px 0 rgba(0,0,0,.5),0 6px 0 #0a0806;position:relative}
+  .A .disc span{position:absolute;color:var(--torch);font-size:20px;left:50%;top:50%;transform:translate(-50%,-50%)}
+  .A .disc .u{top:20%}.A .disc .d{top:80%}.A .disc .l{left:20%}.A .disc .r{left:80%}
+  .A .disc::after{content:'';position:absolute;inset:38%;border-radius:50%;background:#1a1512;box-shadow:inset 0 2px 4px rgba(0,0,0,.6)}
+
+  /* ================= B. 석판 ================= */
+  .B{font-family:'Noto Sans KR',sans-serif;background:#1c1613}
+  .B .hud{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;padding:16px 18px 6px}
+  .B .hud .back{color:var(--muted);font-size:13px;background:none;border:0;justify-self:start;font-family:inherit}
+  .B .hud .big{font-family:'Black Han Sans',sans-serif;font-size:56px;line-height:.9;color:var(--text);text-align:center}
+  .B .hud .big small{display:block;font-family:'Noto Sans KR';font-size:12px;color:var(--muted);letter-spacing:0;margin-top:6px;font-weight:400}
+  .B .hud .lvn{justify-self:end;text-align:right;font-size:13px;color:var(--muted)}
+  .B .hud .lvn b{display:block;color:var(--text);font-size:15px;font-weight:700}
+  .B .board-wrap{padding:8px}
+  .B .floor{background:#3a2c22;background-image:linear-gradient(rgba(0,0,0,.18) 1px,transparent 1px),linear-gradient(90deg,rgba(0,0,0,.18) 1px,transparent 1px);background-size:50% 50%}
+  .B .wall{background:#4a3c33;border-radius:2px;box-shadow:inset 3px 3px 0 rgba(255,255,255,.12),inset -3px -5px 0 rgba(0,0,0,.45),0 4px 0 #120e0b}
+  .B .goal::after{content:'';position:absolute;left:50%;top:50%;width:34%;height:34%;transform:translate(-50%,-50%) rotate(45deg);
+    background:linear-gradient(135deg,#d9f6ff,#7ee0ff 55%,#2a9fc4);box-shadow:0 0 14px 3px rgba(126,224,255,.6)}
+  .B .box::before{content:'';position:absolute;inset:7%;border-radius:3px;background:var(--wood);box-shadow:inset 0 0 0 3px var(--wood-dark),inset 0 -5px 0 rgba(0,0,0,.3),0 4px 0 #2b1a0c;
+    background-image:linear-gradient(to bottom,transparent 46%,rgba(0,0,0,.3) 46% 54%,transparent 54%)}
+  .B .box.done::before{background-color:var(--wood-done);box-shadow:inset 0 0 0 3px #2f8a40,inset 0 -5px 0 rgba(0,0,0,.3),0 4px 0 #17451f}
+  .B .box.done::after{content:'✔';position:absolute;inset:0;display:grid;place-items:center;color:#0e3b18;font-weight:900;font-size:24px}
+  .B .player::before{content:'';position:absolute;inset:18%;border-radius:50% 50% 42% 42%;background:radial-gradient(circle at 35% 35%,#ffe3b0,var(--torch) 60%,#c47a1c);box-shadow:0 0 16px 4px rgba(255,179,71,.4)}
+  .B .ctl{display:grid;grid-template-columns:1fr auto;align-items:center;gap:16px;padding:10px 20px 24px;background:#120e0b;border-top:2px solid #2a2320}
+  .B .stack{display:flex;flex-direction:column;gap:8px}
+  .B .stone{background:#3a2f27;border:0;border-radius:6px;color:var(--text);font-family:inherit;font-size:14px;padding:11px 14px;text-align:left;
+    box-shadow:inset 2px 2px 0 rgba(255,255,255,.08),inset -2px -3px 0 rgba(0,0,0,.4),0 3px 0 #0a0806}
+  .B .stone.dim{opacity:.45}
+  .B .dpad{display:grid;grid-template-columns:repeat(3,48px);grid-template-rows:repeat(3,48px);gap:3px;grid-template-areas:'. u .' 'l . r' '. d .'}
+  .B .dpad b{display:grid;place-items:center;background:#3a2f27;border-radius:6px;color:var(--torch);font-size:16px;
+    box-shadow:inset 2px 2px 0 rgba(255,255,255,.08),inset -2px -3px 0 rgba(0,0,0,.4),0 3px 0 #0a0806}
+  .B .dpad .u{grid-area:u}.B .dpad .d{grid-area:d}.B .dpad .l{grid-area:l}.B .dpad .r{grid-area:r}
+
+  /* ================= C. 발광 동굴 ================= */
+  .C{font-family:'Gowun Dodum',sans-serif;background:radial-gradient(ellipse at 50% 100%,rgba(126,224,255,.14),transparent 55%),#140f0c}
+  .C .hud{display:flex;align-items:center;justify-content:space-between;padding:16px 20px 8px}
+  .C .hud .back{color:var(--muted);font-size:14px;background:none;border:0;font-family:inherit}
+  .C .hud .lv{font-size:17px}
+  .C .hud .lv small{color:var(--glow);margin-left:8px;font-size:13px}
+  .C .hud .moves{font-size:14px;color:var(--muted)}
+  .C .hud .moves b{color:var(--text);font-size:18px}
+  .C .floor{background:#33271f;border-radius:6px;box-shadow:inset 0 0 0 1px rgba(0,0,0,.3)}
+  .C .wall{background:#241d18;border-radius:10px;box-shadow:inset 0 0 0 2px #3a2f27,inset 0 -3px 0 rgba(0,0,0,.4)}
+  /* 핵심: 목표점이 바닥을 물들이는 발광 */
+  .C .goal{border-radius:6px;background:radial-gradient(circle,rgba(126,224,255,.35),rgba(126,224,255,.06) 60%,transparent 72%)}
+  .C .goal::after{content:'';position:absolute;inset:34%;border-radius:50%;background:radial-gradient(circle at 40% 35%,#eaf9ff,var(--glow) 50%,#3aa9cc);box-shadow:0 0 18px 6px rgba(126,224,255,.55)}
+  .C .goal::before{content:'';position:absolute;left:22%;top:28%;width:14%;height:14%;border-radius:50%;background:#bdefff;box-shadow:0 0 8px 2px rgba(126,224,255,.6);opacity:.8}
+  .C .box::before{content:'';position:absolute;inset:8%;border-radius:8px;background:var(--wood);box-shadow:inset 0 0 0 3px var(--wood-dark),0 3px 6px rgba(0,0,0,.5);
+    background-image:linear-gradient(to bottom,transparent 45%,rgba(0,0,0,.22) 45% 55%,transparent 55%),linear-gradient(to right,transparent 45%,rgba(0,0,0,.22) 45% 55%,transparent 55%)}
+  .C .box.done::before{background-color:var(--wood-done);box-shadow:inset 0 0 0 3px #2f8a40,0 0 18px 4px rgba(88,196,106,.7)}
+  .C .box.done::after{content:'✔';position:absolute;inset:0;display:grid;place-items:center;color:#0e3b18;font-weight:900;font-size:24px}
+  .C .player::before{content:'';position:absolute;inset:18%;border-radius:50% 50% 40% 40%;background:radial-gradient(circle at 35% 35%,#ffe3b0,var(--torch) 60%,#c47a1c);box-shadow:0 0 22px 6px rgba(255,179,71,.5)}
+  .C .ctl{position:relative;height:210px}
+  .C .ring{position:absolute;left:50%;bottom:22px;transform:translateX(-50%);width:170px;height:170px;border-radius:50%;
+    background:radial-gradient(circle,#1a1512 0 30%,#2a2320 31% 100%);box-shadow:inset 0 0 0 2px rgba(126,224,255,.25),0 0 30px rgba(126,224,255,.12),0 8px 0 #0a0806}
+  .C .ring::before,.C .ring::after{content:'';position:absolute;background:#140f0c;left:50%;top:50%}
+  .C .ring::before{width:2px;height:100%;transform:translate(-50%,-50%) rotate(45deg)}
+  .C .ring::after{width:2px;height:100%;transform:translate(-50%,-50%) rotate(-45deg)}
+  .C .ring span{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);color:var(--glow);font-size:18px;z-index:1}
+  .C .ring .u{top:16%}.C .ring .d{top:84%}.C .ring .l{left:16%}.C .ring .r{left:84%}
+  .C .side{position:absolute;bottom:34px;display:flex;flex-direction:column;gap:10px}
+  .C .side.left{left:20px}.C .side.right{right:20px}
+  .C .pill{width:56px;height:56px;border-radius:50%;border:1px solid rgba(255,255,255,.12);background:#2a2320;color:var(--text);font-family:inherit;font-size:11px;display:grid;place-items:center;line-height:1.1;box-shadow:0 3px 0 #0a0806}
+  .C .pill i{font-style:normal;font-size:18px;display:block;color:var(--torch)}
+  .C .pill.dim{opacity:.45}
+
+  /* 메인 화면 미니 */
+  .main{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;text-align:center}
+  .main .t{margin:0}
+  .main .s{color:var(--muted);font-size:14px;margin:0 0 14px}
+  .A .main .t{font-size:40px;font-weight:700;letter-spacing:2px;text-shadow:0 0 30px rgba(255,179,71,.6)}
+  .B .main .t{font-family:'Black Han Sans';font-size:58px;line-height:1;text-shadow:0 6px 0 #0a0806}
+  .C .main .t{font-size:38px;text-shadow:0 0 30px rgba(126,224,255,.5)}
+  .main .cta{border:0;font-family:inherit;font-size:17px;padding:14px 0;width:220px;border-radius:12px;cursor:pointer}
+  .main .cta.p{background:var(--torch);color:#2a1a05;font-weight:700}
+  .main .cta.g{background:transparent;color:var(--text);border:1px solid rgba(255,255,255,.18)}
+  .A .main .cta{border-radius:4px;box-shadow:0 3px 0 #3d2410}
+  .B .main .cta{border-radius:6px;box-shadow:0 4px 0 #0a0806}
+  .C .main .cta{border-radius:999px}
+  .main .k{color:var(--muted);font-size:12px;margin-top:18px}
+  .pair{display:flex;gap:18px;flex-wrap:wrap}
+  .pair .phone.mini{width:220px;height:440px;border-width:5px;border-radius:26px}
+  .mini .main .t{font-size:24px!important;line-height:1.15!important;text-shadow:0 3px 0 #0a0806}
+  .mini .main .cta{width:150px;font-size:13px;padding:10px 0}
+  .mini .main .s{font-size:11px}
+  .mini .main .k{font-size:9px}
+</style>
+</head>
+<body>
+<h1>동굴 소코반 — 디자인 시안 3안</h1>
+<p class="lead">현재 톤(어두운 암갈색 암석, 횃불 앰버, 시안 발광, 나무 상자)을 유지하면서, 각 시안은 과감함을 한 곳에만 씁니다. 왼쪽이 게임 화면, 오른쪽이 메인 화면입니다. 5단계 「좁은 통로」 기준.</p>
+
+<div class="row">
+
+  <!-- A -->
+  <section class="proposal">
+    <h2>A. 횃불 빛</h2>
+    <p>플레이어가 든 횃불이 주변만 비추고 가장자리는 어둠에 잠깁니다. 동굴이 '배경'이 아니라 '공간'이 됩니다. 명조 서체와 나무 판자 버튼, 돌을 깎아 만든 원반형 조작부.</p>
+    <div class="pair">
+      <div class="phone"><div class="scr A">
+        <div class="hud">
+          <button class="back">◀ 목록</button>
+          <div class="lv">5단계<small>좁은 통로</small></div>
+          <div class="moves">이동<b>12</b></div>
+        </div>
+        <div class="board-wrap" id="boardA"></div>
+        <div class="ctl">
+          <div class="stack"><button class="plank">↶ 되돌리기</button><button class="plank dim">⟳ 다시 시작</button></div>
+          <div class="disc"><span class="u">▲</span><span class="d">▼</span><span class="l">◀</span><span class="r">▶</span></div>
+        </div>
+      </div></div>
+      <div class="phone mini"><div class="scr A"><div class="main">
+        <h1 class="t">동굴 소코반</h1><p class="s">상자를 밀어 빛나는 자리에</p>
+        <button class="cta p">이어서 하기</button><button class="cta g">처음부터</button><button class="cta g">단계 선택</button>
+        <p class="k">방향키 · WASD · 스와이프</p>
+      </div></div></div>
+    </div>
+    <ul>
+      <li>서체: Gowun Batang (전체)</li>
+      <li>핵심 장치: 플레이어 중심 조명 마스크 (이동 시 함께 움직임)</li>
+      <li>버튼: 나무 판자 / 조작부: 돌 원반</li>
+    </ul>
+  </section>
+
+  <!-- B -->
+  <section class="proposal">
+    <h2>B. 석판</h2>
+    <p>벽을 두껍게 깎은 돌블록으로, 목표는 바닥에 박힌 수정 결정으로. 이동 횟수를 HUD의 주인공으로 크게 새겨 '몇 수에 풀었나'가 게임의 목표임을 드러냅니다.</p>
+    <div class="pair">
+      <div class="phone"><div class="scr B">
+        <div class="hud">
+          <button class="back">◀ 목록</button>
+          <div class="big">12<small>이동</small></div>
+          <div class="lvn">5단계<b>좁은 통로</b></div>
+        </div>
+        <div class="board-wrap" id="boardB"></div>
+        <div class="ctl">
+          <div class="stack"><button class="stone">↶ 되돌리기</button><button class="stone dim">⟳ 다시 시작</button></div>
+          <div class="dpad"><b class="u">▲</b><b class="l">◀</b><b class="r">▶</b><b class="d">▼</b></div>
+        </div>
+      </div></div>
+      <div class="phone mini"><div class="scr B"><div class="main">
+        <h1 class="t">동굴<br>소코반</h1><p class="s">상자를 밀어 수정 위에 놓으세요</p>
+        <button class="cta p">이어서 하기</button><button class="cta g">처음부터</button><button class="cta g">단계 선택</button>
+        <p class="k">방향키 · WASD · 스와이프</p>
+      </div></div></div>
+    </div>
+    <ul>
+      <li>서체: Black Han Sans (큰 숫자·제목) + Noto Sans KR (본문)</li>
+      <li>핵심 장치: 수정 결정 목표점, 두께감 있는 돌블록 벽</li>
+      <li>버튼: 깎은 돌 / 조작부: 십자 돌 D-pad</li>
+    </ul>
+  </section>
+
+  <!-- C -->
+  <section class="proposal">
+    <h2>C. 발광 동굴</h2>
+    <p>시안 발광을 과감하게 씁니다. 목표점은 발광 버섯처럼 주변 바닥을 물들이고, 조작은 한 손 엄지에 맞춘 하단 원형 링 하나로 모읍니다. 둥근 고딕으로 부드럽게.</p>
+    <div class="pair">
+      <div class="phone"><div class="scr C">
+        <div class="hud">
+          <button class="back">◀ 목록</button>
+          <div class="lv">5단계<small>좁은 통로</small></div>
+          <div class="moves">이동 <b>12</b></div>
+        </div>
+        <div class="board-wrap" id="boardC"></div>
+        <div class="ctl">
+          <div class="side left"><button class="pill"><i>↶</i>되돌리기</button></div>
+          <div class="ring"><span class="u">▲</span><span class="d">▼</span><span class="l">◀</span><span class="r">▶</span></div>
+          <div class="side right"><button class="pill dim"><i>⟳</i>다시</button></div>
+        </div>
+      </div></div>
+      <div class="phone mini"><div class="scr C"><div class="main">
+        <h1 class="t">동굴 소코반</h1><p class="s">빛나는 자리에 상자를 놓으세요</p>
+        <button class="cta p">이어서 하기</button><button class="cta g">처음부터</button><button class="cta g">단계 선택</button>
+        <p class="k">방향키 · WASD · 스와이프</p>
+      </div></div></div>
+    </div>
+    <ul>
+      <li>서체: Gowun Dodum (전체)</li>
+      <li>핵심 장치: 바닥까지 물드는 발광 목표점, 원형 링 컨트롤</li>
+      <li>버튼: 둥근 알약 / 조작부: 한 손용 링</li>
+    </ul>
+  </section>
+</div>
+
+<script>
+const MAP = ['######','#    #','# #@ #','# $* #','# .* #','#    #','######'];
+function render(id){
+  const wrap=document.getElementById(id);
+  const H=MAP.length,W=Math.max(...MAP.map(r=>r.length)),cell=48;
+  const b=document.createElement('div');b.className='board';b.style.width=W*cell+'px';b.style.height=H*cell+'px';
+  let px=0,py=0;
+  const add=(cls,x,y)=>{const d=document.createElement('div');d.className='cell '+cls;d.style.transform=`translate(${x*cell}px,${y*cell}px)`;b.appendChild(d)};
+  MAP.forEach((row,y)=>[...row].forEach((ch,x)=>{
+    if(ch==='#'){add('wall',x,y);return}
+    add('floor',x,y);
+    if(ch==='.'||ch==='*'||ch==='+')add('goal',x,y);
+    if(ch==='$')add('box',x,y);
+    if(ch==='*')add('box done',x,y);
+    if(ch==='@'||ch==='+'){px=x;py=y}
+  }));
+  add('player',px,py);
+  wrap.appendChild(b);
+  if(id==='boardA'){
+    const d=document.createElement('div');d.className='dark';
+    const r=wrap.getBoundingClientRect(),bb=b.getBoundingClientRect();
+    d.style.setProperty('--lx',(bb.left-r.left+px*cell+cell/2)+'px');
+    d.style.setProperty('--ly',(bb.top-r.top+py*cell+cell/2)+'px');
+    wrap.appendChild(d);
+  }
+}
+['boardA','boardB','boardC'].forEach(render);
+</script>
+</body>
+</html>
